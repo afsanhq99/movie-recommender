@@ -11,11 +11,14 @@ const MovieCarousel = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const containerRefs = useRef({
+
+    // 🔹 Fix: Use separate refs for each category (No nested .current)
+    const containerRefs = {
         trending: useRef(null),
         topRated: useRef(null),
         nowPlaying: useRef(null),
-    });
+    };
+
     const router = useRouter();
 
     useEffect(() => {
@@ -59,11 +62,38 @@ const MovieCarousel = () => {
         fetchMovies();
     }, []);
 
+    // 🔹 Fix: Ensure event listeners use `.current` properly
+    useEffect(() => {
+        const handleWheelScroll = (event, category) => {
+            const container = containerRefs[category]?.current;
+            if (container && event.deltaY !== 0) {
+                event.preventDefault();
+                container.scrollLeft += event.deltaY;
+            }
+        };
+
+        for (const category in containerRefs) {
+            const container = containerRefs[category]?.current;
+            if (container) {
+                container.addEventListener('wheel', (event) => handleWheelScroll(event, category), { passive: false });
+            }
+        }
+
+        return () => {
+            for (const category in containerRefs) {
+                const container = containerRefs[category]?.current;
+                if (container) {
+                    container.removeEventListener('wheel', (event) => handleWheelScroll(event, category));
+                }
+            }
+        };
+    }, [movies]);
+
     useEffect(() => {
         const intervalId = setInterval(() => {
             for (const category in movies) {
-                if (movies[category].length > 0 && containerRefs.current[category]) {
-                    const container = containerRefs.current[category];
+                if (movies[category].length > 0 && containerRefs[category]?.current) {
+                    const container = containerRefs[category].current;
                     const firstChild = container.firstChild;
 
                     if (firstChild) {
@@ -76,7 +106,7 @@ const MovieCarousel = () => {
                     }
                 }
             }
-        }, 3000);
+        }, 2000);
 
         return () => clearInterval(intervalId);
     }, [movies]);
@@ -85,29 +115,26 @@ const MovieCarousel = () => {
         router.push(`/movie/${movieId}`);
     };
 
-    // Loading spinner component
-    const LoadingSkeleton = () => {
-        return (
-            <div className="container mx-auto">
-                {['Trending Movies', 'Top Rated Movies', 'Now Playing Movies'].map((title, index) => (
-                    <section key={index} className="p-4 mb-8">
-                        <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/4 mb-4"></div>
-                        <div className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide">
-                            {[...Array(5)].map((_, index) => (
-                                <div key={index} className="w-40 min-w-[160px] bg-gray-800 p-2 rounded animate-pulse">
-                                    <div className="aspect-[2/3] bg-gray-900 rounded mb-2">
-                                    </div>
-                                    <div className="h-4 bg-gray-900 rounded-md"></div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                ))}
-            </div>
-        );
-    }
+    // 🔹 Loading Skeleton Component
+    const LoadingSkeleton = () => (
+        <div className="container mx-auto">
+            {['Trending Movies', 'Top Rated Movies', 'Now Playing Movies'].map((title, index) => (
+                <section key={index} className="p-4 mb-8">
+                    <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/4 mb-4"></div>
+                    <div className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide">
+                        {[...Array(5)].map((_, index) => (
+                            <div key={index} className="w-40 min-w-[160px] bg-gray-800 p-2 rounded animate-pulse">
+                                <div className="aspect-[2/3] bg-gray-900 rounded mb-2"></div>
+                                <div className="h-4 bg-gray-900 rounded-md"></div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            ))}
+        </div>
+    );
 
-    // Error message component
+    // 🔹 Error Message Component
     const ErrorMessage = () => (
         <div className="flex justify-center items-center min-h-screen text-red-500">
             Error: {error}
@@ -122,8 +149,7 @@ const MovieCarousel = () => {
         return <ErrorMessage />;
     }
 
-
-    const renderCarousel = (title, movieList) => {
+    const renderCarousel = (title, movieList, category) => {
         if (!movieList || movieList.length === 0) {
             return null;
         }
@@ -131,7 +157,10 @@ const MovieCarousel = () => {
         return (
             <section className="p-4 mb-8">
                 <h3 className="text-2xl font-semibold mb-4">{title}</h3>
-                <div className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide" ref={el => containerRefs.current[title.split(" ")[0]] = el}>
+                <div
+                    className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide"
+                    ref={containerRefs[category]} // 🔹 Fixed ref assignment
+                >
                     {movieList.map((movie) => (
                         <div key={movie.id} className="w-40 min-w-[160px] relative bg-gray-800 p-2 rounded hover:scale-105 transition">
                             {movie.poster_url && (
@@ -144,7 +173,7 @@ const MovieCarousel = () => {
                                         className="h-48 w-full object-cover rounded"
                                     />
                                     <div className="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs py-1 px-2 rounded">
-                                        {title.split(" ")[0]}
+                                        {category}
                                     </div>
                                     <div className="absolute bottom-2 right-2 bg-yellow-500 text-black font-bold py-0.5 px-1 rounded-md shadow-sm flex items-center text-xs">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 mr-0.5">
@@ -167,9 +196,9 @@ const MovieCarousel = () => {
 
     return (
         <div className="container mx-auto">
-            {renderCarousel("Trending Movies", movies.trending)}
-            {renderCarousel("Top Rated Movies", movies.topRated)}
-            {renderCarousel("Now Playing Movies", movies.nowPlaying)}
+            {renderCarousel("Trending Movies", movies.trending, "trending")}
+            {renderCarousel("Top Rated Movies", movies.topRated, "topRated")}
+            {renderCarousel("Now Playing Movies", movies.nowPlaying, "nowPlaying")}
         </div>
     );
 };
