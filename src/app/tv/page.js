@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Import Link
+import Link from 'next/link';
 
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
@@ -61,9 +61,9 @@ const TvShowList = () => {
 
     const TvShowSkeleton = () => (
         <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-bold mb-8 text-center h-8 bg-gray-800 rounded-md animate-pulse w-1/3 mx-auto"></h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-8 text-center h-8 bg-gray-800 rounded-md animate-pulse w-2/3 sm:w-1/2 md:w-1/3 mx-auto"></h1>
             <div className="flex justify-between items-center mb-4">
-                <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/4"></div>
+                <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/2 sm:w-1/4"></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, index) => (
@@ -77,8 +77,8 @@ const TvShowList = () => {
                 ))}
             </div>
             <div className="flex justify-center items-center gap-2 mt-8">
-                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6"></div>
-                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6"></div>
+                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6 sm:w-1/12"></div>
+                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6 sm:w-1/12"></div>
             </div>
         </div>
     );
@@ -89,19 +89,20 @@ const TvShowList = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <Link href="/" className="inline-block bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+            <Link href="/" className="inline-block bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md mb-4">
                 ← Back to Movies
             </Link>
-            <h1 className="text-3xl font-bold mb-8 text-center">Discover TV Shows</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Discover TV Shows</h1>
 
-            <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
+
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2 sm:gap-0">
+                <div className="flex items-center gap-2 mb-2 sm:mb-0">
                     <label htmlFor="sort" className="font-medium text-gray-200">Sort By:</label>
                     <select
                         id="sort"
                         value={sortBy}
                         onChange={handleSortChange}
-                        className="bg-gray-700 text-white rounded px-4 py-2 text-sm"
+                        className="bg-gray-700 text-white rounded px-2 py-1 text-sm"
                     >
                         <option value="popularity.desc">Popularity</option>
                         <option value="vote_average.desc">Rating</option>
@@ -117,11 +118,11 @@ const TvShowList = () => {
                         placeholder="Search TV Shows..."
                         value={searchQuery}
                         onChange={handleSearchInputChange}
-                        className="bg-gray-700 text-white rounded px-4 py-2 text-sm focus:outline-none"
+                        className="bg-gray-700 text-white rounded px-2 py-1 text-sm focus:outline-none w-full sm:w-auto"
                     />
                     <button
                         onClick={handleSearchSubmit}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded-md"
                     >
                         Search
                     </button>

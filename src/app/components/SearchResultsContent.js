@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -15,6 +15,7 @@ export function SearchResultsContent() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [ratingFilter, setRatingFilter] = useState(0);
+    const [showSidebar, setShowSidebar] = useState(false);
 
     useEffect(() => {
         if (!query) return;
@@ -44,13 +45,56 @@ export function SearchResultsContent() {
         fetchMovies();
     }, [query, ratingFilter]);
 
+    useEffect(() => {
+        // Set sidebar to visible on small screens
+        const handleResize = () => {
+            if (window.innerWidth < 640) {
+                setShowSidebar(true);
+            } else {
+                setShowSidebar(false)
+            }
+        }
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+    }, []);
+
+    const toggleSidebar = () => {
+        setShowSidebar(!showSidebar);
+    };
+
     return (
         <div className="flex min-h-screen bg-gray-900 text-white">
             {/* Sidebar */}
-            <div className="w-64 bg-gray-800 p-6">
-                <h2 className="text-xl font-semibold mb-4">Filter by Rating</h2>
+            <aside
+                className={`fixed sm:relative top-0 left-0 z-10 w-full sm:w-64 bg-gray-800 p-4 sm:p-6 transition-transform transform ${showSidebar ? 'translate-x-0' : '-translate-x-full'
+                    } sm:translate-x-0`}
+            >
+                <div className="flex justify-between items-center sm:block mb-4">
+                    <h2 className="text-xl font-semibold">Filter by Rating</h2>
+                    <button
+                        onClick={toggleSidebar}
+                        className="sm:hidden text-gray-300 hover:text-white focus:outline-none"
+                    >
+                        {showSidebar ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                        )}
+
+                    </button>
+                </div>
+
                 <div className="mb-4">
-                    <label htmlFor="rating" className="text-sm">Minimum Rating:</label>
+                    <label htmlFor="rating" className="text-sm block">Minimum Rating:</label>
                     <input
                         id="rating"
                         type="range"
@@ -67,10 +111,10 @@ export function SearchResultsContent() {
                     </div>
                     <p className="text-sm mt-2">Selected Rating: {ratingFilter}</p>
                 </div>
-            </div>
+            </aside>
 
             {/* Main Content */}
-            <div className="flex-1 p-6">
+            <main className="flex-1 p-4 sm:p-6">
                 <button
                     onClick={() => router.push("/")}
                     className="mb-6 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-md transition"
@@ -78,7 +122,7 @@ export function SearchResultsContent() {
                     ⬅ Back to Home
                 </button>
 
-                <h1 className="text-3xl font-bold mb-6 text-center">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
                     Search Results for "<span className="text-blue-400">{query}</span>"
                 </h1>
 
@@ -87,7 +131,7 @@ export function SearchResultsContent() {
 
                 <div className="mt-6">
                     {movies.length > 0 ? (
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {movies.map((movie, index) => (
                                 <li
                                     key={movie.id}
@@ -95,27 +139,28 @@ export function SearchResultsContent() {
                                 >
                                     <Link href={`/movie/${movie.id}`}>
                                         {movie.poster_path ? (
-                                            <Image
-                                                src={`${TMDB_IMAGE_BASE_URL}/w500${movie.poster_path}`}
-                                                alt={movie.title}
-                                                width={500}
-                                                height={750}
-                                                className="rounded-lg shadow-md mx-auto"
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                quality={80}
-                                                priority={index < 3}
-                                                loading={index < 3 ? undefined : "lazy"}
-                                            />
+                                            <div className="relative aspect-[2/3]">
+                                                <Image
+                                                    src={`${TMDB_IMAGE_BASE_URL}/w500${movie.poster_path}`}
+                                                    alt={movie.title}
+                                                    fill
+                                                    className="rounded-lg shadow-md mx-auto object-cover"
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    quality={80}
+                                                    priority={index < 3}
+                                                    loading={index < 3 ? undefined : "lazy"}
+                                                />
+                                            </div>
                                         ) : (
-                                            <div className="w-48 h-72 bg-gray-700 flex items-center justify-center text-gray-400 rounded-lg mx-auto">
+                                            <div className="aspect-[2/3]  bg-gray-700 flex items-center justify-center text-gray-400 rounded-lg mx-auto">
                                                 No Image
                                             </div>
                                         )}
                                         <div className="mt-4 text-center">
                                             <h2 className="text-lg font-semibold">{movie.title}</h2>
                                             <p className="text-sm text-gray-400">{movie.release_date}</p>
-                                            <p className="text-sm mt-2 text-gray-300">
-                                                {movie.overview.slice(0, 100)}...
+                                            <p className="text-sm mt-2 text-gray-300 line-clamp-2">
+                                                {movie.overview}
                                             </p>
                                             <p className="mt-2 text-yellow-400 font-semibold">
                                                 Rating: {movie.vote_average.toFixed(1)} / 10
@@ -131,7 +176,7 @@ export function SearchResultsContent() {
                         )
                     )}
                 </div>
-            </div>
+            </main>
         </div>
     );
 }

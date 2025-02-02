@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; // Import Link
+import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
@@ -43,16 +43,19 @@ const TvSearchResults = () => {
         }
     }, [query, page]);
 
-
     const handlePageChange = (newPage) => {
         if (newPage >= 1) {
+            // Use router.push for navigation and update the query params
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set('page', newPage.toString());
+            router.push(`/tv/search?${newParams.toString()}`)
             setPage(newPage);
         }
     };
 
     const TvSearchSkeleton = () => (
         <div className="container mx-auto p-4">
-            <div className="text-3xl font-bold mb-8 text-center h-8 bg-gray-800 rounded-md animate-pulse w-1/3 mx-auto"></div>
+            <div className="text-3xl font-bold mb-8 text-center h-8 bg-gray-800 rounded-md animate-pulse w-2/3 sm:w-1/2 md:w-1/3 mx-auto"></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {[...Array(8)].map((_, index) => (
                     <div key={index} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg animate-pulse">
@@ -65,8 +68,8 @@ const TvSearchResults = () => {
                 ))}
             </div>
             <div className="flex justify-center items-center gap-2 mt-8">
-                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6"></div>
-                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6"></div>
+                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6 sm:w-1/12"></div>
+                <div className="h-10 bg-gray-800 rounded-md animate-pulse w-1/6 sm:w-1/12"></div>
             </div>
         </div>
     );
@@ -120,6 +123,25 @@ const TvSearchResults = () => {
                 ))}
             </div>
 
+            {/* Pagination */}
+            {tvShows.length > 0 && (
+                <div className="flex justify-center items-center mt-8 gap-4">
+                    <button
+                        onClick={() => handlePageChange(page - 1)}
+                        disabled={page <= 1}
+                        className={`bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                        Previous
+                    </button>
+                    <span className="text-white">Page {page}</span>
+                    <button
+                        onClick={() => handlePageChange(page + 1)}
+                        className={`bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md`}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
