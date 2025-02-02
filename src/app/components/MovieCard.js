@@ -2,7 +2,9 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 
-export default function MovieCard({ movie }) {
+export default function MovieCard({ movie, isLoading }) {
+    if (isLoading) return <MovieCardSkeleton />;
+
     if (!movie) return null;
 
     const cardVariants = {
@@ -65,4 +67,24 @@ export default function MovieCard({ movie }) {
             </motion.div>
         </motion.div>
     );
+}
+
+
+function MovieCardSkeleton() {
+    return (
+        <div
+            className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg transition-all transform animate-pulse"
+        >
+            <div className="relative w-full h-72 rounded-lg overflow-hidden bg-gray-800" >
+
+            </div>
+            <div className="mt-4 space-y-2">
+                <div className='h-6 bg-gray-800 rounded-md '></div>
+                <div className='h-4 bg-gray-800 rounded-md '></div>
+                <div className='h-4 bg-gray-800 rounded-md '></div>
+                <div className='h-4 bg-gray-800 rounded-md '></div>
+
+            </div>
+        </div>
+    )
 }

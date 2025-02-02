@@ -12,11 +12,16 @@ const Navbar = () => {
 
                 {/* Flexbox container for Button and Search */}
                 <div className="w-full flex items-center justify-between px-4">
-                    {/* Left Section (Recommendation Button) */}
-                    <div>
+                    {/* Left Section (Recommendation and TV Show Button) */}
+                    <div className="flex gap-4">
                         <Link href="/movie/recommendation" passHref legacyBehavior>
                             <button className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:scale-105 transform transition duration-300">
                                 Get Recommendation Using Gemini
+                            </button>
+                        </Link>
+                        <Link href="/tv" passHref legacyBehavior>
+                            <button className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:scale-105 transform transition duration-300">
+                                Discover TV Shows
                             </button>
                         </Link>
                     </div>

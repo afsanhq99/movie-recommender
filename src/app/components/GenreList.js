@@ -35,28 +35,38 @@ export default function GenreList() {
         router.push(`/movie/search?query=${genreName}`);
     };
 
-    return (
+    const GenreSkeleton = () => (
         <div className="p-4">
-            <h2 className="text-2xl font-bold mb-4">Movie Genres</h2>
-            {loading && (
-                <div className="flex justify-center items-center">
-                    {/* Loading spinner */}
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
-                </div>
-            )}
-            {error && <p className="text-center text-red-500">{error}</p>}
-
+            <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/3 mb-4"></div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
-                {genres.map((genre) => (
-                    <div
-                        key={genre.id}
-                        className="bg-gray-900 p-4 rounded-lg text-center shadow-md hover:bg-gray-300 transition cursor-pointer"
-                        onClick={() => handleGenreClick(genre.name)} // Trigger search on genre click
-                    >
-                        {genre.name}
+                {[...Array(10)].map((_, index) => (
+                    <div key={index} className="bg-gray-800 rounded-lg h-12 animate-pulse">
                     </div>
                 ))}
             </div>
+        </div>
+    );
+
+
+    return (
+        <div className="p-4">
+            <h2 className="text-2xl font-bold mb-4">Movie Genres</h2>
+            {loading && <GenreSkeleton />}
+            {error && <p className="text-center text-red-500">{error}</p>}
+
+            {!loading && !error && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
+                    {genres.map((genre) => (
+                        <div
+                            key={genre.id}
+                            className="bg-gray-900 p-4 rounded-lg text-center shadow-md hover:bg-gray-300 transition cursor-pointer"
+                            onClick={() => handleGenreClick(genre.name)} // Trigger search on genre click
+                        >
+                            {genre.name}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

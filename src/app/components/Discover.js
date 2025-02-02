@@ -41,12 +41,43 @@ export default function Discover() {
         fetchMovies();
     }, []);
 
-    if (loading) return (
-        <div className="flex justify-center items-center min-h-screen">
-            {/* Loading spinner */}
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
+
+    const DiscoverSkeleton = () => (
+        <div className="container mx-auto p-4">
+            <div className="text-3xl font-bold mb-8 text-center h-8 bg-gray-800 rounded-md animate-pulse w-1/3 mx-auto"></div>
+            <section className="mb-12">
+                <div className="text-2xl font-semibold mb-4 h-6 bg-gray-800 rounded-md animate-pulse w-1/4"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {[...Array(4)].map((_, index) => (
+                        <div key={index} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg animate-pulse">
+                            <div className="aspect-[2/3] bg-gray-900"></div>
+                            <div className="p-4">
+                                <div className="h-4 bg-gray-900 rounded-md mb-2"></div>
+                                <div className="h-4 bg-gray-900 rounded-md w-1/2"></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+            <section className="mb-12">
+                <div className="text-2xl font-semibold mb-4 h-6 bg-gray-800 rounded-md animate-pulse w-1/4"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {[...Array(4)].map((_, index) => (
+                        <div key={index} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg animate-pulse">
+                            <div className="aspect-[2/3] bg-gray-900"></div>
+                            <div className="p-4">
+                                <div className="h-4 bg-gray-900 rounded-md mb-2"></div>
+                                <div className="h-4 bg-gray-900 rounded-md w-1/2"></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
+
+
+    if (loading) return <DiscoverSkeleton />;
     if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">Error: {error}</div>;
 
     return (

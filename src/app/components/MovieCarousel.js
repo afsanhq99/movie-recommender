@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Import useRouter from next/navigation
+import { useRouter } from 'next/navigation';
 
 const MovieCarousel = () => {
     const [movies, setMovies] = useState({
@@ -16,7 +16,7 @@ const MovieCarousel = () => {
         topRated: useRef(null),
         nowPlaying: useRef(null),
     });
-    const router = useRouter(); // Initialize router
+    const router = useRouter();
 
     useEffect(() => {
         const fetchMovies = async () => {
@@ -28,7 +28,7 @@ const MovieCarousel = () => {
                 ]);
 
                 if (!trendingRes.ok || !topRatedRes.ok || !nowPlayingRes.ok) {
-                    const errorMessages = await Promise.all([ // Handle errors
+                    const errorMessages = await Promise.all([
                         trendingRes.ok ? null : trendingRes.text(),
                         topRatedRes.ok ? null : topRatedRes.text(),
                         nowPlayingRes.ok ? null : nowPlayingRes.text(),
@@ -68,29 +68,44 @@ const MovieCarousel = () => {
 
                     if (firstChild) {
                         container.scrollBy({
-                            left: firstChild.offsetWidth + 16, // Adjust for gap between items
+                            left: firstChild.offsetWidth + 16,
                             behavior: 'smooth',
                         });
                     } else {
-                        clearInterval(intervalId); // Stop if no children
+                        clearInterval(intervalId);
                     }
                 }
             }
-        }, 3000); // Auto-scroll every 3 seconds
+        }, 3000);
 
-        return () => clearInterval(intervalId); // Clean up on unmount
+        return () => clearInterval(intervalId);
     }, [movies]);
 
     const handleMovieClick = (movieId) => {
-        router.push(`/movie/${movieId}`); // Navigate to movie details page
+        router.push(`/movie/${movieId}`);
     };
 
     // Loading spinner component
-    const LoadingSpinner = () => (
-        <div className="flex justify-center items-center min-h-screen">
-            <div className="w-16 h-16 border-4 border-t-4 border-gray-800 rounded-full animate-spin"></div>
-        </div>
-    );
+    const LoadingSkeleton = () => {
+        return (
+            <div className="container mx-auto">
+                {['Trending Movies', 'Top Rated Movies', 'Now Playing Movies'].map((title, index) => (
+                    <section key={index} className="p-4 mb-8">
+                        <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/4 mb-4"></div>
+                        <div className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide">
+                            {[...Array(5)].map((_, index) => (
+                                <div key={index} className="w-40 min-w-[160px] bg-gray-800 p-2 rounded animate-pulse">
+                                    <div className="aspect-[2/3] bg-gray-900 rounded mb-2">
+                                    </div>
+                                    <div className="h-4 bg-gray-900 rounded-md"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                ))}
+            </div>
+        );
+    }
 
     // Error message component
     const ErrorMessage = () => (
@@ -100,12 +115,13 @@ const MovieCarousel = () => {
     );
 
     if (loading) {
-        return <LoadingSpinner />;
+        return <LoadingSkeleton />;
     }
 
     if (error) {
         return <ErrorMessage />;
     }
+
 
     const renderCarousel = (title, movieList) => {
         if (!movieList || movieList.length === 0) {
