@@ -37,10 +37,10 @@ export default function GenreList() {
 
     const GenreSkeleton = () => (
         <div className="p-4">
-            <div className="h-8 bg-gray-800 rounded-md animate-pulse w-1/3 mb-4"></div>
+            <div className="h-8 bg-gray-200 rounded-md animate-pulse w-1/3 mb-4"></div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
                 {[...Array(10)].map((_, index) => (
-                    <div key={index} className="bg-gray-800 rounded-lg h-12 animate-pulse">
+                    <div key={index} className="bg-gray-200 rounded-lg h-12 animate-pulse">
                     </div>
                 ))}
             </div>
@@ -59,7 +59,7 @@ export default function GenreList() {
                     {genres.map((genre) => (
                         <div
                             key={genre.id}
-                            className="bg-gray-900 p-4 rounded-lg text-center shadow-md hover:bg-gray-300 transition cursor-pointer"
+                            className="bg-white p-4 rounded-lg text-center shadow-md hover:bg-gray-100 transition cursor-pointer text-gray-800"
                             onClick={() => handleGenreClick(genre.name)} // Trigger search on genre click
                         >
                             {genre.name}
